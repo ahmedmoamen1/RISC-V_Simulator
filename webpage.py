@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request
 import transalate as ts
 import time
-app = Flask(__name__)
+app = Flask(__name__, template_folder='/Users/ahmedmoamen/Desktop/ahmed/school/2023 spring/assembly/Risc-v Simulator/templates')
+
 
 @app.route('/')
 def index():

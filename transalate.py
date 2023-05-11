@@ -214,16 +214,11 @@ def LH(r1, r2):
 
 
 def LW(r1, r2):
-
-    if r2 in data:
-        registers[r1] = data[r2]
-        registers["pc"] += 4
-    else:
-        memoryOff = separateOffset(r2)
-        location = memoryOff[0]+registers[memoryOff[1]]
-        binary = memory.read(location) + memory.read(location+1)[2:] + memory.read(location+2)[2:] + memory.read(location+3)[2:]
-        registers[r1] = binary_to_signed_int(binary[2:])
-        registers["pc"] += 4
+    memoryOff = separateOffset(r2)
+    location = memoryOff[0]+registers[memoryOff[1]]
+    binary = memory.read(location) + memory.read(location+1)[2:] + memory.read(location+2)[2:] + memory.read(location+3)[2:]
+    registers[r1] = binary_to_signed_int(binary[2:])
+    registers["pc"] += 4
 
 
 def LD(r1, r2):
@@ -460,6 +455,9 @@ def jalr(r1, imm_r2):
     registers[r1] = registers["pc"] + 4
     registers["pc"] = location
 
+def li(r1, imm):
+    registers[r1] = int(imm);
+    registers["pc"] += 4
 
 label_addressmap = {
 }
@@ -504,7 +502,8 @@ instruction_map = {
     "sw": sw,
     "sd": sd,
     "jal": jal,
-    "jalr": jalr
+    "jalr": jalr,
+    "li": li
 }
 
 codeaddress = {}
@@ -583,6 +582,8 @@ def translate_instruction(instruction):
     tokens = instruction.split()
     # extract the operation and register names
     op = tokens[0]
+    if op == "ecall":
+        registers["pc"] = sys.maxsize
     # look up the function for the given operation
     if op in instruction_map:
         operation_func = instruction_map[op]
